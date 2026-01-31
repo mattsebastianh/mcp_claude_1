@@ -74,7 +74,6 @@ def fetch_doc_content(doc_id: str) -> str:
 def format_doc(
     doc_id: str = Field(description="Id of the document to format")
 ) -> list[base.Message]:
-    prompt = f"Rewrite the content of the document with id '{doc_id}' in markdown format."
     prompt = f"""
     You are a document conversion specialist tasked with rewriting documents in markdown format. 
     Your goal is to reformat the given document and enhance its readability by adding 
