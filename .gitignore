@@ -4,6 +4,8 @@
 *.env
 .secrets
 secrets/
+setup_env.md
+mcp-chat-guideline.md
 
 # Python
 __pycache__/
