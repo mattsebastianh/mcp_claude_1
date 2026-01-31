@@ -1,111 +1,202 @@
-# MCP Chat
+# MCP Claude - Document Management CLI
 
-MCP Chat is a command-line interface application that enables interactive chat capabilities with AI models through the Anthropic API. The application supports document retrieval, command-based prompts, and extensible tool integrations via the MCP (Model Control Protocol) architecture.
+A powerful command-line interface application that integrates **Model Context Protocol (MCP)** with **Claude AI** for intelligent document management, formatting, and summarization.
 
-## Prerequisites
+## 🎯 Overview
 
-- Python 3.9+
-- Anthropic API Key
+MCP Claude is a Python-based CLI tool that demonstrates how to build AI-powered document workflows using the Model Context Protocol. It provides a conversational interface where users can interact with documents, apply AI-driven formatting, and generate summaries—all through natural language commands.
 
-## Setup
+## ✨ Features
 
-### Step 1: Configure the environment variables
+### MCP Server Capabilities
 
-1. Create or edit the `.env` file in the project root and verify that the following variables are set correctly:
+| Feature | Description |
+|---------|-------------|
+| **Tools** | `read_doc_content` - Read document contents<br>`edit_doc_content` - Edit documents with find/replace |
+| **Resources** | `docs://documents` - List all document IDs<br>`docs://documents/{doc_id}` - Fetch specific document content |
+| **Prompts** | `/format` - Convert documents to well-structured Markdown<br>`/summarize` - Generate concise document summaries |
+
+### CLI Features
+
+- 💬 **Interactive Chat** - Natural language conversation with Claude AI
+- 📄 **Document Mentions** - Reference documents using `@document.ext` syntax
+- 🔧 **Tool Integration** - AI automatically uses available tools to complete tasks
+- 🔄 **Multi-Client Support** - Connect multiple MCP servers simultaneously
+
+## 🏗️ Architecture
 
 ```
-ANTHROPIC_API_KEY=""  # Enter your Anthropic API secret key
+mcp_claude_1/
+├── main.py              # Application entry point
+├── mcp_server.py        # MCP server with tools, resources, and prompts
+├── mcp_client.py        # MCP client wrapper for server communication
+├── core/
+│   ├── chat.py          # Base chat functionality
+│   ├── cli_chat.py      # CLI-specific chat implementation
+│   ├── cli.py           # CLI application UI
+│   ├── claude.py        # Anthropic Claude API wrapper
+│   └── tools.py         # Tool execution manager
+├── pyproject.toml       # Project configuration
+└── .env                 # Environment variables (API keys)
 ```
 
-### Step 2: Install dependencies
+## 🚀 Getting Started
 
-#### Option 1: Setup with uv (Recommended)
+### Prerequisites
 
-[uv](https://github.com/astral-sh/uv) is a fast Python package installer and resolver.
+- Python 3.10+
+- Anthropic API key
 
-1. Install uv, if not already installed:
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/mattsebastianh/mcp_claude_1.git
+   cd mcp_claude_1
+   ```
+
+2. **Create and activate virtual environment**
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -e .
+   # Or using uv
+   uv sync
+   ```
+
+4. **Configure environment variables**
+   
+   Create a `.env` file in the project root:
+   ```env
+   ANTHROPIC_API_KEY=your_api_key_here
+   CLAUDE_MODEL=claude-sonnet-4-20250514
+   USE_UV=0  # Set to 1 if using uv package manager
+   ```
+
+### Running the Application
 
 ```bash
-pip install uv
-```
+# Activate the virtual environment
+source .venv/bin/activate
 
-2. Create and activate a virtual environment:
-
-```bash
-uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
-
-3. Install dependencies:
-
-```bash
-uv pip install -e .
-```
-
-4. Run the project
-
-```bash
-uv run main.py
-```
-
-#### Option 2: Setup without uv
-
-1. Create and activate a virtual environment:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
-
-2. Install dependencies:
-
-```bash
-pip install anthropic python-dotenv prompt-toolkit "mcp[cli]==1.8.0"
-```
-
-3. Run the project
-
-```bash
+# Run the CLI application
 python main.py
 ```
 
-## Usage
+## 📖 Usage
 
-### Basic Interaction
+### Interactive Commands
 
-Simply type your message and press Enter to chat with the model.
-
-### Document Retrieval
-
-Use the @ symbol followed by a document ID to include document content in your query:
+Once the CLI is running, you can interact with documents:
 
 ```
-> Tell me about @deposition.md
+> What documents are available?
+> @report.pdf What does this report cover?
+> /format deposition.md
+> /summarize financials.docx
 ```
 
-### Commands
+### Document Mentions
 
-Use the / prefix to execute commands defined in the MCP server:
+Reference documents directly in your queries using the `@` prefix:
 
 ```
-> /summarize deposition.md
+> Compare @report.pdf with @outlook.pdf
+> Summarize the key points from @deposition.md
 ```
 
-Commands will auto-complete when you press Tab.
+### Prompt Commands
 
-## Development
+Use slash commands to trigger specific AI workflows:
 
-### Adding New Documents
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `/format` | `/format <doc_id>` | Convert document to structured Markdown |
+| `/summarize` | `/summarize <doc_id>` | Generate a concise 3-5 sentence summary |
 
-Edit the `mcp_server.py` file to add new documents to the `docs` dictionary.
+## 🔧 MCP Server Details
 
-### Implementing MCP Features
+### Tools
 
-To fully implement the MCP features:
+#### `read_doc_content`
+Reads and returns the content of a document.
+```python
+# Input
+{"doc_id": "report.pdf"}
 
-1. Complete the TODOs in `mcp_server.py`
-2. Implement the missing functionality in `mcp_client.py`
+# Output
+"The report details the state of a 20m condenser tower."
+```
 
-### Linting and Typing Check
+#### `edit_doc_content`
+Edits document content by replacing strings.
+```python
+# Input
+{
+    "doc_id": "report.pdf",
+    "old_strings": ["20m"],
+    "new_strings": ["25m"]
+}
+```
 
-There are no lint or type checks implemented.
+### Resources
+
+- **`docs://documents`** - Returns a JSON array of all document IDs
+- **`docs://documents/{doc_id}`** - Returns the plain text content of a specific document
+
+### Prompts
+
+The MCP server exposes prompts that provide structured instructions to the AI:
+
+- **`format`** - Guides the AI to reformat documents into clean Markdown with proper headers, lists, and tables
+- **`summarize`** - Instructs the AI to extract key points and create concise summaries
+
+## 🧪 Testing with MCP Inspector
+
+Test your MCP server implementation using the MCP Inspector:
+
+```bash
+# Using the virtual environment python
+npx @modelcontextprotocol/inspector .venv/bin/python mcp_server.py
+```
+
+This opens a web interface at `http://localhost:6274` where you can:
+- View available tools, resources, and prompts
+- Test tool calls with different inputs
+- Debug server responses
+
+## 📦 Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `anthropic` | Claude AI API client |
+| `mcp[cli]` | Model Context Protocol SDK |
+| `fastmcp` | FastMCP server framework |
+| `prompt-toolkit` | Interactive CLI interface |
+| `python-dotenv` | Environment variable management |
+
+## 🔐 Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ANTHROPIC_API_KEY` | Yes | Your Anthropic API key |
+| `CLAUDE_MODEL` | Yes | Claude model to use (e.g., `claude-sonnet-4-20250514`) |
+| `USE_UV` | No | Set to `1` to use uv package manager (default: `0`) |
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+## 🔗 Resources
+
+- [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
+- [Anthropic Claude API](https://docs.anthropic.com/)
+- [FastMCP Framework](https://github.com/jlowin/fastmcp)
