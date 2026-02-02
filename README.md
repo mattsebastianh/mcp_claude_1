@@ -46,46 +46,132 @@ mcp_claude_1/
 
 - Python 3.10+
 - Anthropic API key
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
 
-### Installation
+---
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/mattsebastianh/mcp_claude_1.git
-   cd mcp_claude_1
-   ```
+### 🟢 Option 1: Using uv (Recommended)
 
-2. **Create and activate virtual environment**
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
+[uv](https://docs.astral.sh/uv/) is an extremely fast Python package and project manager written in Rust. It handles virtual environments and dependencies automatically, making setup straightforward.
 
-3. **Install dependencies**
-   ```bash
-   pip install -e .
-   # Or using uv
-   uv sync
-   ```
-
-4. **Configure environment variables**
-   
-   Create a `.env` file in the project root:
-   ```env
-   ANTHROPIC_API_KEY=your_api_key_here
-   CLAUDE_MODEL=claude-sonnet-4-20250514
-   USE_UV=0  # Set to 1 if using uv package manager
-   ```
-
-### Running the Application
+#### Step 1: Install uv
 
 ```bash
-# Activate the virtual environment
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Or via Homebrew (macOS)
+brew install uv
+```
+
+#### Step 2: Clone the Repository
+
+```bash
+git clone https://github.com/mattsebastianh/mcp_claude_1.git
+cd mcp_claude_1
+```
+
+#### Step 3: Install Dependencies
+
+```bash
+# uv automatically creates .venv and installs all dependencies
+uv sync
+```
+
+> **Note:** `uv sync` reads `pyproject.toml` and `uv.lock` to install exact dependency versions, ensuring reproducible builds.
+
+#### Step 4: Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+CLAUDE_MODEL="claude-sonnet-4-5"
+ANTHROPIC_API_KEY="<YOUR-CLAUDE-API-KEY>"
+
+# Set to 1 when using uv
+USE_UV=1
+```
+
+#### Step 5: Run the Application
+
+```bash
+# uv run automatically uses the project's virtual environment
+uv run python main.py
+```
+
+**Why use uv?**
+- ⚡ 10-100x faster than pip
+- 🔒 Lock file support (`uv.lock`) for reproducible builds
+- 🎯 Automatic virtual environment management
+- 📦 Built-in dependency resolver
+
+---
+
+### 🔵 Option 2: Using pip (Alternative)
+
+Traditional Python setup using pip and venv.
+
+#### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/mattsebastianh/mcp_claude_1.git
+cd mcp_claude_1
+```
+
+#### Step 2: Create Virtual Environment
+
+```bash
+python3 -m venv .venv
+```
+
+#### Step 3: Activate Virtual Environment
+
+```bash
+# macOS / Linux
 source .venv/bin/activate
 
-# Run the CLI application
+# Windows (Command Prompt)
+.venv\Scripts\activate
+
+# Windows (PowerShell)
+.venv\Scripts\Activate.ps1
+```
+
+#### Step 4: Install Dependencies
+
+```bash
+pip install -r requirements.txt
+
+# Or install in editable mode for development
+pip install -e .
+```
+
+#### Step 5: Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+CLAUDE_MODEL="claude-sonnet-4-5"
+ANTHROPIC_API_KEY="<YOUR-CLAUDE-API-KEY>"
+
+# Set to 0 when using pip
+USE_UV=0
+```
+
+#### Step 6: Run the Application
+
+```bash
+# Make sure virtual environment is activated
+source .venv/bin/activate  # macOS/Linux
+
+# Run the application
 python main.py
 ```
+
+---
 
 ## 📖 Usage
 
@@ -160,7 +246,10 @@ The MCP server exposes prompts that provide structured instructions to the AI:
 Test your MCP server implementation using the MCP Inspector:
 
 ```bash
-# Using the virtual environment python
+# Using uv (recommended)
+npx @modelcontextprotocol/inspector uv run python mcp_server.py
+
+# Using pip/venv (make sure .venv is activated)
 npx @modelcontextprotocol/inspector .venv/bin/python mcp_server.py
 ```
 
@@ -184,8 +273,8 @@ This opens a web interface at `http://localhost:6274` where you can:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `ANTHROPIC_API_KEY` | Yes | Your Anthropic API key |
-| `CLAUDE_MODEL` | Yes | Claude model to use (e.g., `claude-sonnet-4-20250514`) |
-| `USE_UV` | No | Set to `1` to use uv package manager (default: `0`) |
+| `CLAUDE_MODEL` | Yes | Claude model to use (e.g., `claude-sonnet-4-5`) |
+| `USE_UV` | No | Set to `1` for uv, `0` for pip (default: `0`) |
 
 ## 🤝 Contributing
 
@@ -200,3 +289,4 @@ This project is open source and available under the MIT License.
 - [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
 - [Anthropic Claude API](https://docs.anthropic.com/)
 - [FastMCP Framework](https://github.com/jlowin/fastmcp)
+- [uv - Python Package Manager](https://docs.astral.sh/uv/)
